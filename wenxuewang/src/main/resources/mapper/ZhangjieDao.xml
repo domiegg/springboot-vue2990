@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhangjieDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xiaoshuo_id as xiaoshuoId
+        ,a.zhangjie_name as zhangjieName
+        ,a.zhangjie_content as zhangjieContent
+        ,a.zhangjie_delete as zhangjieDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhangjieView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,xiaoshuo.zuozhe_id as xiaoshuoZuozheId
+        ,xiaoshuo.xiaoshuo_name as xiaoshuoName
+        ,xiaoshuo.xiaoshuo_photo as xiaoshuoPhoto
+        ,xiaoshuo.xiaoshuo_types as xiaoshuoTypes
+        ,xiaoshuo.xiaoshuo_old_money as xiaoshuoOldMoney
+        ,xiaoshuo.xiaoshuo_new_money as xiaoshuoNewMoney
+        ,xiaoshuo.xiaoshuo_clicknum as xiaoshuoClicknum
+        ,xiaoshuo.zan_number as zanNumber
+        ,xiaoshuo.cai_number as caiNumber
+        ,xiaoshuo.xiaoshuo_content as xiaoshuoContent
+        ,xiaoshuo.shangxia_types as shangxiaTypes
+        ,xiaoshuo.xiaoshuo_delete as xiaoshuoDelete
+
+        FROM zhangjie  a
+        left JOIN xiaoshuo xiaoshuo ON a.xiaoshuo_id = xiaoshuo.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.xiaoshuoId != null and params.xiaoshuoId != ''">
+                and (
+                    a.xiaoshuo_id = #{params.xiaoshuoId}
+                )
+            </if>
+            <if test=" params.zhangjieName != '' and params.zhangjieName != null and params.zhangjieName != 'null' ">
+                and a.zhangjie_name like CONCAT('%',#{params.zhangjieName},'%')
+            </if>
+            <if test=" params.zhangjieContent != '' and params.zhangjieContent != null and params.zhangjieContent != 'null' ">
+                and a.zhangjie_content like CONCAT('%',#{params.zhangjieContent},'%')
+            </if>
+            <if test="params.zhangjieDeleteStart != null and params.zhangjieDeleteStart != ''">
+                <![CDATA[  and a.zhangjie_delete >= #{params.zhangjieDeleteStart}   ]]>
+            </if>
+            <if test="params.zhangjieDeleteEnd != null and params.zhangjieDeleteEnd != ''">
+                <![CDATA[  and a.zhangjie_delete <= #{params.zhangjieDeleteEnd}   ]]>
+            </if>
+             <if test="params.zhangjieDelete != null and params.zhangjieDelete != ''">
+                and a.zhangjie_delete = #{params.zhangjieDelete}
+             </if>
+
+                <!-- 判断文学信息的id不为空 -->
+            <if test=" params.xiaoshuoIdNotNull != '' and params.xiaoshuoIdNotNull != null and params.xiaoshuoIdNotNull != 'null' ">
+                and a.xiaoshuo_id IS NOT NULL
+            </if>
+            <if test="params.zuozheId != null  and params.zuozheId != ''">
+                and xiaoshuo.zuozhe_id = #{params.zuozheId}
+            </if>
+            <if test=" params.xiaoshuoName != '' and params.xiaoshuoName != null and params.xiaoshuoName != 'null' ">
+                and xiaoshuo.xiaoshuo_name like CONCAT('%',#{params.xiaoshuoName},'%')
+            </if>
+            <if test="params.xiaoshuoTypes != null  and params.xiaoshuoTypes != ''">
+                and xiaoshuo.xiaoshuo_types = #{params.xiaoshuoTypes}
+            </if>
+
+            <if test="params.xiaoshuoOldMoneyStart != null ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_old_money >= #{params.xiaoshuoOldMoneyStart}   ]]>
+            </if>
+            <if test="params.xiaoshuoOldMoneyEnd != null ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_old_money <= #{params.xiaoshuoOldMoneyEnd}   ]]>
+            </if>
+            <if test="params.xiaoshuoNewMoneyStart != null ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_new_money >= #{params.xiaoshuoNewMoneyStart}   ]]>
+            </if>
+            <if test="params.xiaoshuoNewMoneyEnd != null ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_new_money <= #{params.xiaoshuoNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.xiaoshuoClicknumStart != null  and params.xiaoshuoClicknumStart != '' ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_clicknum >= #{params.xiaoshuoClicknumStart}   ]]>
+            </if>
+            <if test="params.xiaoshuoClicknumEnd != null  and params.xiaoshuoClicknumEnd != '' ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_clicknum <= #{params.xiaoshuoClicknumEnd}   ]]>
+            </if>
+            <if test="params.xiaoshuoClicknum != null  and params.xiaoshuoClicknum != '' ">
+                and xiaoshuo.xiaoshuo_clicknum = #{params.xiaoshuoClicknum}
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and xiaoshuo.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and xiaoshuo.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and xiaoshuo.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and xiaoshuo.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and xiaoshuo.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and xiaoshuo.cai_number = #{params.caiNumber}
+            </if>
+            <if test=" params.xiaoshuoContent != '' and params.xiaoshuoContent != null and params.xiaoshuoContent != 'null' ">
+                and xiaoshuo.xiaoshuo_content like CONCAT('%',#{params.xiaoshuoContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and xiaoshuo.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.xiaoshuoDeleteStart != null  and params.xiaoshuoDeleteStart != '' ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_delete >= #{params.xiaoshuoDeleteStart}   ]]>
+            </if>
+            <if test="params.xiaoshuoDeleteEnd != null  and params.xiaoshuoDeleteEnd != '' ">
+                <![CDATA[  and xiaoshuo.xiaoshuo_delete <= #{params.xiaoshuoDeleteEnd}   ]]>
+            </if>
+            <if test="params.xiaoshuoDelete != null  and params.xiaoshuoDelete != '' ">
+                and xiaoshuo.xiaoshuo_delete = #{params.xiaoshuoDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
